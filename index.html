@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Community Futsal Tournament 2026 | Game Day System</title>
+    <meta name="description" content="Live game day control center for Community Futsal Tournament 2026 — scores, standings, knockout bracket, and player leaderboard." />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -34,9 +35,9 @@
             Connect once so all devices can share one live tournament state.
           </p>
           <div class="sync-grid">
-            <label>Supabase URL <input id="sbUrl" placeholder="https://YOUR-PROJECT.supabase.co" /></label>
-            <label>Supabase anon key <input id="sbKey" placeholder="eyJ..." /></label>
-            <label>Room ID <input id="sbRoom" placeholder="community-futsal-2026" /></label>
+            <label>Supabase URL <input id="sbUrl" placeholder="https://YOUR-PROJECT.supabase.co" autocomplete="off" /></label>
+            <label>Supabase anon key <input id="sbKey" type="password" placeholder="eyJ..." autocomplete="off" /></label>
+            <label>Room ID <input id="sbRoom" placeholder="community-futsal-2026" autocomplete="off" /></label>
           </div>
           <div class="sync-actions">
             <button id="connectSyncBtn" class="btn primary">Connect Sync</button>

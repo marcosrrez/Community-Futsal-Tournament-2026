@@ -143,6 +143,7 @@ function scoreRow(matchId, side, teamName) {
   const input = document.createElement("input");
   input.type = "number";
   input.min = "0";
+  input.max = "99";
   input.value = state.group[matchId][`score${side}`];
   input.addEventListener("change", (e) => updateGroup(matchId, `score${side}`, e.target.value));
   wrap.append(label, input);
@@ -157,6 +158,7 @@ function knockoutScoreRow(matchId, side, teamName) {
   const input = document.createElement("input");
   input.type = "number";
   input.min = "0";
+  input.max = "99";
   input.value = state.knockout[matchId][`score${side}`];
   input.addEventListener("change", (e) => updateKnockout(matchId, `score${side}`, e.target.value));
   wrap.append(label, input);
