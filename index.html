@@ -3,112 +3,101 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Community Futsal Tournament 2026 | Game Day System</title>
-    <meta name="description" content="Live game day control center for Community Futsal Tournament 2026 — scores, standings, knockout bracket, and player leaderboard." />
+    <meta name="description" content="Live scores, standings, and bracket for Community Futsal Tournament 2026." />
+    <title>Futsal 2026 – Game Day</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <div>
-        <p class="eyebrow">Community Futsal Tournament 2026</p>
-        <h1>Game Day Control Center + Live Player View</h1>
-        <p>
-          Run the full tournament in one place: schedule, live scoring, standings,
-          knockout bracket, and player leaderboard stats.
-        </p>
+    <header class="topbar">
+      <div class="topbar-left">
+        <p class="eyebrow">Futsal Tournament 2026</p>
+        <h1>Game Day</h1>
       </div>
-      <div class="hero-actions">
-        <button id="resetBtn" class="btn danger">Reset Tournament Data</button>
+      <div class="topbar-right">
+        <div class="tab-bar" role="tablist">
+          <button class="tab active" data-tab="live" role="tab">Live</button>
+          <button class="tab" data-tab="ops" role="tab">Admin</button>
+        </div>
+        <button id="resetBtn" class="btn danger sm">Reset</button>
       </div>
     </header>
 
     <main>
-      <section class="tab-bar" aria-label="App views">
-        <button class="tab active" data-tab="ops">Ops Console</button>
-        <button class="tab" data-tab="live">Player Live View</button>
-      </section>
+      <!-- ── LIVE / PLAYER VIEW ───────────────────── -->
+      <section id="live" class="tab-panel active" role="tabpanel">
 
-      <section id="ops" class="tab-panel active">
         <div class="card">
-          <h2>Shared Cloud Sync (Supabase)</h2>
-          <p class="muted">
-            Connect once so all devices can share one live tournament state.
-          </p>
-          <div class="sync-grid">
-            <label>Supabase URL <input id="sbUrl" placeholder="https://YOUR-PROJECT.supabase.co" autocomplete="off" /></label>
-            <label>Supabase anon key <input id="sbKey" type="password" placeholder="eyJ..." autocomplete="off" /></label>
-            <label>Room ID <input id="sbRoom" placeholder="community-futsal-2026" autocomplete="off" /></label>
-          </div>
-          <div class="sync-actions">
-            <button id="connectSyncBtn" class="btn primary">Connect Sync</button>
-            <button id="disconnectSyncBtn" class="btn">Disconnect</button>
-            <button id="pullSyncBtn" class="btn">Pull Latest</button>
-            <button id="pushSyncBtn" class="btn">Push Now</button>
-          </div>
-          <p id="syncStatus" class="muted">Sync: not connected.</p>
+          <p class="card-title">Schedule</p>
+          <div id="scheduleView"></div>
         </div>
 
         <div class="card">
-          <h2>Group Stage Schedule + Scoring</h2>
-          <p class="muted">
-            Enter scores and optional scorers separated by commas (example:
-            <strong>A. Cruz, J. Perez</strong>).
-          </p>
-          <div id="groupMatchesAdmin" class="match-grid"></div>
-        </div>
-
-        <div class="card">
-          <h2>Knockout Stage Manager</h2>
-          <p class="muted">
-            Quarterfinal teams are auto-filled from group standings. For tied knockout
-            scores, select a winner after penalties.
-          </p>
-          <div id="knockoutAdmin" class="match-grid"></div>
-        </div>
-      </section>
-
-      <section id="live" class="tab-panel">
-        <div class="card">
-          <h2>Live Standings</h2>
+          <p class="card-title">Group Standings</p>
           <div id="standingsContainer" class="standings-grid"></div>
         </div>
 
-        <div class="card">
-          <h2>Live Stat Leaders</h2>
-          <div class="stats-row">
-            <article>
-              <h3>Most Goals (Players)</h3>
-              <ol id="topScorers"></ol>
-            </article>
-            <article>
-              <h3>Most Wins (Teams)</h3>
-              <ol id="topWins"></ol>
-            </article>
+        <div class="card" id="bracketCard">
+          <p class="card-title">Knockout Bracket</p>
+          <div class="bracket-scroll">
+            <div id="bracketView" class="bracket-tree"></div>
           </div>
         </div>
 
         <div class="card">
-          <h2>Match Timeline</h2>
-          <div id="timeline"></div>
+          <p class="card-title">Stat Leaders</p>
+          <div class="leaders-row">
+            <div>
+              <h3>Top Scorers</h3>
+              <ol id="topScorers"></ol>
+            </div>
+            <div>
+              <h3>Most Wins</h3>
+              <ol id="topWins"></ol>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── ADMIN / OPS VIEW ─────────────────────── -->
+      <section id="ops" class="tab-panel" role="tabpanel">
+
+        <details class="card sync-details">
+          <summary>Cloud Sync (Supabase)</summary>
+          <div class="sync-body">
+            <div class="sync-fields">
+              <label class="field-label">Supabase URL
+                <input id="sbUrl" type="text" placeholder="https://YOUR-PROJECT.supabase.co" autocomplete="off" />
+              </label>
+              <label class="field-label">Anon Key
+                <input id="sbKey" type="password" placeholder="eyJ..." autocomplete="off" />
+              </label>
+              <label class="field-label">Room ID
+                <input id="sbRoom" type="text" placeholder="community-futsal-2026" autocomplete="off" />
+              </label>
+            </div>
+            <div class="sync-actions">
+              <button id="connectSyncBtn" class="btn primary sm">Connect</button>
+              <button id="disconnectSyncBtn" class="btn sm">Disconnect</button>
+              <button id="pullSyncBtn" class="btn sm">Pull</button>
+              <button id="pushSyncBtn" class="btn sm">Push</button>
+              <span id="syncStatus">Not connected</span>
+            </div>
+          </div>
+        </details>
+
+        <div class="card">
+          <p class="card-title">Group Stage</p>
+          <div id="groupMatchesAdmin" class="admin-list"></div>
         </div>
 
         <div class="card">
-          <h2>Bracket Snapshot</h2>
-          <div id="bracketView" class="bracket-grid"></div>
+          <p class="card-title">Knockout Stage</p>
+          <div id="knockoutAdmin" class="admin-list"></div>
         </div>
+
       </section>
     </main>
-
-    <template id="adminMatchTemplate">
-      <article class="match-card">
-        <header>
-          <p class="chip"></p>
-          <h3></h3>
-          <p class="muted"></p>
-        </header>
-        <div class="teams"></div>
-      </article>
-    </template>
 
     <script src="app.js"></script>
   </body>
