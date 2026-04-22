@@ -1,5 +1,8 @@
-const STORAGE_KEY = "futsal-2026-state";
-const SYNC_KEY = "futsal-2026-sync";
+// ── DATA ──────────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY  = "futsal-2026-state";
+const SYNC_KEY     = "futsal-2026-sync";
+const TEAM_KEY     = "futsal-2026-team";
 const SYNC_POLL_MS = 5000;
 
 const groups = {
@@ -10,185 +13,277 @@ const groups = {
 };
 
 const groupMatches = [
-  { id: "G1",  time: "9:30 AM",  court: "Court 1", teamA: "Aztecas FC",             teamB: "Gentry Uncs",                group: "A" },
-  { id: "G2",  time: "9:30 AM",  court: "Court 2", teamA: "El Club",                teamB: "Tekks",                      group: "C" },
-  { id: "G3",  time: "10:00 AM", court: "Court 1", teamA: "Rayo FC",                teamB: "Los Tigrillos de Zaragoza",   group: "B" },
-  { id: "G4",  time: "10:00 AM", court: "Court 2", teamA: "La Mezcla Perfecta",     teamB: "Dragon Ball A",              group: "D" },
-  { id: "G5",  time: "10:30 AM", court: "Court 1", teamA: "Gentry Uncs",            teamB: "Glacier FC",                 group: "A" },
-  { id: "G6",  time: "10:30 AM", court: "Court 2", teamA: "Tekks",                  teamB: "Botafogo FC",                group: "C" },
-  { id: "G7",  time: "11:00 AM", court: "Court 1", teamA: "Los Tigrillos de Zaragoza", teamB: "SSBC",                   group: "B" },
-  { id: "G8",  time: "11:00 AM", court: "Court 2", teamA: "Dragon Ball A",          teamB: "3 Puntos Fáciles",           group: "D" },
-  { id: "G9",  time: "11:30 AM", court: "Court 1", teamA: "Aztecas FC",             teamB: "Glacier FC",                 group: "A" },
-  { id: "G10", time: "11:30 AM", court: "Court 2", teamA: "El Club",                teamB: "Botafogo FC",                group: "C" },
-  { id: "G11", time: "12:00 PM", court: "Court 1", teamA: "Rayo FC",                teamB: "SSBC",                       group: "B" },
-  { id: "G12", time: "12:00 PM", court: "Court 2", teamA: "La Mezcla Perfecta",     teamB: "3 Puntos Fáciles",           group: "D" },
+  { id:"G1",  time:"9:30 AM",  court:"Court 1", teamA:"Aztecas FC",                teamB:"Gentry Uncs",                group:"A" },
+  { id:"G2",  time:"9:30 AM",  court:"Court 2", teamA:"El Club",                   teamB:"Tekks",                      group:"C" },
+  { id:"G3",  time:"10:00 AM", court:"Court 1", teamA:"Rayo FC",                   teamB:"Los Tigrillos de Zaragoza",  group:"B" },
+  { id:"G4",  time:"10:00 AM", court:"Court 2", teamA:"La Mezcla Perfecta",        teamB:"Dragon Ball A",              group:"D" },
+  { id:"G5",  time:"10:30 AM", court:"Court 1", teamA:"Gentry Uncs",               teamB:"Glacier FC",                 group:"A" },
+  { id:"G6",  time:"10:30 AM", court:"Court 2", teamA:"Tekks",                     teamB:"Botafogo FC",                group:"C" },
+  { id:"G7",  time:"11:00 AM", court:"Court 1", teamA:"Los Tigrillos de Zaragoza", teamB:"SSBC",                       group:"B" },
+  { id:"G8",  time:"11:00 AM", court:"Court 2", teamA:"Dragon Ball A",             teamB:"3 Puntos Fáciles",           group:"D" },
+  { id:"G9",  time:"11:30 AM", court:"Court 1", teamA:"Aztecas FC",                teamB:"Glacier FC",                 group:"A" },
+  { id:"G10", time:"11:30 AM", court:"Court 2", teamA:"El Club",                   teamB:"Botafogo FC",                group:"C" },
+  { id:"G11", time:"12:00 PM", court:"Court 1", teamA:"Rayo FC",                   teamB:"SSBC",                       group:"B" },
+  { id:"G12", time:"12:00 PM", court:"Court 2", teamA:"La Mezcla Perfecta",        teamB:"3 Puntos Fáciles",           group:"D" },
 ];
 
 const knockoutTemplate = [
-  { id: "QF1",   round: "Quarterfinal", time: "1:00 PM", court: "Court 1", slotA: "1st Group A", slotB: "2nd Group B" },
-  { id: "QF2",   round: "Quarterfinal", time: "1:00 PM", court: "Court 2", slotA: "1st Group B", slotB: "2nd Group A" },
-  { id: "QF3",   round: "Quarterfinal", time: "1:30 PM", court: "Court 1", slotA: "1st Group C", slotB: "2nd Group D" },
-  { id: "QF4",   round: "Quarterfinal", time: "1:30 PM", court: "Court 2", slotA: "1st Group D", slotB: "2nd Group C" },
-  { id: "SF1",   round: "Semifinal",    time: "2:00 PM", court: "Court 1", slotA: "Winner QF1",  slotB: "Winner QF3" },
-  { id: "SF2",   round: "Semifinal",    time: "2:00 PM", court: "Court 2", slotA: "Winner QF2",  slotB: "Winner QF4" },
-  { id: "THIRD", round: "3rd Place",    time: "2:30 PM", court: "Court 1", slotA: "Loser SF1",   slotB: "Loser SF2" },
-  { id: "FINAL", round: "Final",        time: "2:30 PM", court: "Court 2", slotA: "Winner SF1",  slotB: "Winner SF2" },
+  { id:"QF1",   round:"Quarterfinal", time:"1:00 PM", court:"Court 1", slotA:"1st Group A", slotB:"2nd Group B" },
+  { id:"QF2",   round:"Quarterfinal", time:"1:00 PM", court:"Court 2", slotA:"1st Group B", slotB:"2nd Group A" },
+  { id:"QF3",   round:"Quarterfinal", time:"1:30 PM", court:"Court 1", slotA:"1st Group C", slotB:"2nd Group D" },
+  { id:"QF4",   round:"Quarterfinal", time:"1:30 PM", court:"Court 2", slotA:"1st Group D", slotB:"2nd Group C" },
+  { id:"SF1",   round:"Semifinal",    time:"2:00 PM", court:"Court 1", slotA:"Winner QF1",  slotB:"Winner QF3"  },
+  { id:"SF2",   round:"Semifinal",    time:"2:00 PM", court:"Court 2", slotA:"Winner QF2",  slotB:"Winner QF4"  },
+  { id:"THIRD", round:"3rd Place",    time:"2:30 PM", court:"Court 1", slotA:"Loser SF1",   slotB:"Loser SF2"   },
+  { id:"FINAL", round:"Final",        time:"2:30 PM", court:"Court 2", slotA:"Winner SF1",  slotB:"Winner SF2"  },
 ];
 
 const defaultState = {
-  group: Object.fromEntries(groupMatches.map((m) => [m.id, { scoreA: "", scoreB: "", scorersA: "", scorersB: "" }])),
-  knockout: Object.fromEntries(knockoutTemplate.map((m) => [m.id, { scoreA: "", scoreB: "", tiebreakWinner: "" }])),
-  meta: { updatedAt: 0 },
+  group:    Object.fromEntries(groupMatches.map(m   => [m.id,   { scoreA:"", scoreB:"", scorersA:"", scorersB:"" }])),
+  knockout: Object.fromEntries(knockoutTemplate.map(m => [m.id, { scoreA:"", scoreB:"", tiebreakWinner:"" }])),
+  meta:     { updatedAt: 0 },
 };
 
-const defaultSyncConfig = { url: "", key: "", room: "", connected: false };
-const state = loadState();
+const defaultSync = { url:"", key:"", room:"", connected:false };
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+
+const state      = loadState();
 const syncConfig = loadSyncConfig();
+let selectedTeam = localStorage.getItem(TEAM_KEY) || "";
 
-let syncPollTimer = null;
-let syncDebounceTimer = null;
-let syncInFlight = false;
-
-// ─── STATE ────────────────────────────────────────────────────────────────────
+let syncPollTimer = null, syncDebounceTimer = null, syncInFlight = false;
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return structuredClone(defaultState);
-    return mergeStateDefaults(JSON.parse(raw));
-  } catch {
-    return structuredClone(defaultState);
-  }
+    return raw ? mergeDefaults(JSON.parse(raw)) : structuredClone(defaultState);
+  } catch { return structuredClone(defaultState); }
 }
 
 function loadSyncConfig() {
   try {
     const raw = localStorage.getItem(SYNC_KEY);
-    if (!raw) return structuredClone(defaultSyncConfig);
-    return { ...structuredClone(defaultSyncConfig), ...JSON.parse(raw) };
-  } catch {
-    return structuredClone(defaultSyncConfig);
-  }
+    return raw ? { ...structuredClone(defaultSync), ...JSON.parse(raw) } : structuredClone(defaultSync);
+  } catch { return structuredClone(defaultSync); }
 }
 
-function mergeStateDefaults(input) {
+function mergeDefaults(input) {
   return {
-    group: { ...structuredClone(defaultState.group), ...(input?.group || {}) },
+    group:    { ...structuredClone(defaultState.group),    ...(input?.group    || {}) },
     knockout: { ...structuredClone(defaultState.knockout), ...(input?.knockout || {}) },
-    meta: { ...structuredClone(defaultState.meta), ...(input?.meta || {}) },
+    meta:     { ...structuredClone(defaultState.meta),     ...(input?.meta     || {}) },
   };
 }
 
-function touchUpdateTime() { state.meta.updatedAt = Date.now(); }
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function saveSyncConfig() { localStorage.setItem(SYNC_KEY, JSON.stringify(syncConfig)); }
+function saveState()    { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function saveSyncConfig(){ localStorage.setItem(SYNC_KEY,   JSON.stringify(syncConfig)); }
+function saveTeam(t)    { selectedTeam = t; localStorage.setItem(TEAM_KEY, t); }
+function touch()        { state.meta.updatedAt = Date.now(); }
 function setSyncStatus(msg) {
   const el = document.getElementById("syncStatus");
   if (el) el.textContent = msg;
 }
 
-// ─── CALCULATIONS ─────────────────────────────────────────────────────────────
+// ── CALCULATIONS ───────────────────────────────────────────────────────────────
 
 function getStandings() {
-  const standings = {};
-  for (const [g, teams] of Object.entries(groups)) {
-    standings[g] = teams.map((team) => ({ team, mp: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, gd: 0, pts: 0 }));
-  }
-  for (const match of groupMatches) {
-    const res = state.group[match.id];
-    const a = Number.parseInt(res.scoreA, 10);
-    const b = Number.parseInt(res.scoreB, 10);
+  const out = {};
+  for (const [g, teams] of Object.entries(groups))
+    out[g] = teams.map(team => ({ team, mp:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0 }));
+
+  for (const m of groupMatches) {
+    const r = state.group[m.id];
+    const a = parseInt(r.scoreA, 10), b = parseInt(r.scoreB, 10);
     if (!Number.isInteger(a) || !Number.isInteger(b)) continue;
-    const table = standings[match.group];
-    const rowA = table.find((r) => r.team === match.teamA);
-    const rowB = table.find((r) => r.team === match.teamB);
-    rowA.mp++; rowB.mp++;
-    rowA.gf += a; rowA.ga += b;
-    rowB.gf += b; rowB.ga += a;
-    if (a > b)      { rowA.w++; rowA.pts += 3; rowB.l++; }
-    else if (b > a) { rowB.w++; rowB.pts += 3; rowA.l++; }
-    else            { rowA.d++; rowB.d++; rowA.pts++; rowB.pts++; }
+    const tbl = out[m.group];
+    const rA = tbl.find(x => x.team === m.teamA);
+    const rB = tbl.find(x => x.team === m.teamB);
+    rA.mp++; rB.mp++;
+    rA.gf += a; rA.ga += b;
+    rB.gf += b; rB.ga += a;
+    if (a > b)      { rA.w++; rA.pts += 3; rB.l++; }
+    else if (b > a) { rB.w++; rB.pts += 3; rA.l++; }
+    else            { rA.d++; rB.d++; rA.pts++; rB.pts++; }
   }
-  for (const group of Object.values(standings)) {
-    for (const row of group) row.gd = row.gf - row.ga;
-    group.sort((x, y) => y.pts - x.pts || y.gd - x.gd || y.gf - x.gf || x.team.localeCompare(y.team));
+
+  for (const grp of Object.values(out)) {
+    for (const r of grp) r.gd = r.gf - r.ga;
+    grp.sort((x,y) => y.pts-x.pts || y.gd-x.gd || y.gf-x.gf || x.team.localeCompare(y.team));
   }
-  return standings;
+  return out;
 }
 
 function getSlotTeam(slot, standings, winners, losers) {
   if (slot.startsWith("1st Group")) return standings[slot.slice(-1)]?.[0]?.team ?? slot;
   if (slot.startsWith("2nd Group")) return standings[slot.slice(-1)]?.[1]?.team ?? slot;
-  if (slot.startsWith("Winner "))   return winners[slot.replace("Winner ", "")] ?? slot;
-  if (slot.startsWith("Loser "))    return losers[slot.replace("Loser ", "")] ?? slot;
+  if (slot.startsWith("Winner "))   return winners[slot.replace("Winner ","")] ?? slot;
+  if (slot.startsWith("Loser "))    return losers[slot.replace("Loser ","")] ?? slot;
   return slot;
 }
 
-function knockoutResult(matchId, teamA, teamB) {
-  const match = state.knockout[matchId];
-  const a = Number.parseInt(match.scoreA, 10);
-  const b = Number.parseInt(match.scoreB, 10);
-  if (!Number.isInteger(a) || !Number.isInteger(b)) return { winner: null, loser: null, score: null };
-  if (a > b) return { winner: teamA, loser: teamB, score: `${a}–${b}` };
-  if (b > a) return { winner: teamB, loser: teamA, score: `${a}–${b}` };
-  if (match.tiebreakWinner === "A") return { winner: teamA, loser: teamB, score: `${a}–${b} (pens)` };
-  if (match.tiebreakWinner === "B") return { winner: teamB, loser: teamA, score: `${a}–${b} (pens)` };
-  return { winner: null, loser: null, score: `${a}–${b}` };
+function knockoutResult(id, tA, tB) {
+  const m = state.knockout[id];
+  const a = parseInt(m.scoreA,10), b = parseInt(m.scoreB,10);
+  if (!Number.isInteger(a) || !Number.isInteger(b)) return { winner:null, loser:null, score:null };
+  if (a > b) return { winner:tA, loser:tB, score:`${a}–${b}` };
+  if (b > a) return { winner:tB, loser:tA, score:`${a}–${b}` };
+  if (m.tiebreakWinner==="A") return { winner:tA, loser:tB, score:`${a}–${b} (pens)` };
+  if (m.tiebreakWinner==="B") return { winner:tB, loser:tA, score:`${a}–${b} (pens)` };
+  return { winner:null, loser:null, score:`${a}–${b}` };
 }
 
-// ─── TIME HELPERS ─────────────────────────────────────────────────────────────
+// ── TIME HELPERS ───────────────────────────────────────────────────────────────
 
-function timeToMinutes(str) {
-  const [time, period] = str.split(" ");
-  let [h, m] = time.split(":").map(Number);
-  if (period === "PM" && h !== 12) h += 12;
-  if (period === "AM" && h === 12) h = 0;
-  return h * 60 + m;
+function toMins(str) {
+  const [t, p] = str.split(" ");
+  let [h, m]   = t.split(":").map(Number);
+  if (p==="PM" && h!==12) h += 12;
+  if (p==="AM" && h===12) h = 0;
+  return h*60 + m;
 }
 
-function nowMinutes() {
+function nowMins() {
   const d = new Date();
-  return d.getHours() * 60 + d.getMinutes();
+  return d.getHours()*60 + d.getMinutes();
 }
 
-// ─── RENDER: SCHEDULE ─────────────────────────────────────────────────────────
+// ── TEAM BANNER ────────────────────────────────────────────────────────────────
+
+function renderTeamBanner() {
+  const el = document.getElementById("teamBanner");
+  el.innerHTML = "";
+
+  const allTeams = Object.values(groups).flat();
+
+  if (selectedTeam) {
+    // Show compact "following" strip with change option
+    const strip = document.createElement("div");
+    strip.className = "team-banner";
+    strip.innerHTML = `
+      <p class="team-banner-label">Following</p>
+      <div class="team-grid" id="teamGridInline"></div>
+    `;
+    el.appendChild(strip);
+    const grid = strip.querySelector("#teamGridInline");
+    for (const name of allTeams) {
+      const btn = document.createElement("button");
+      btn.className = `team-btn${name === selectedTeam ? " selected" : ""}`;
+      btn.textContent = name;
+      btn.addEventListener("click", () => { saveTeam(name); renderAll(); });
+      grid.appendChild(btn);
+    }
+  } else {
+    // First-time prompt
+    const strip = document.createElement("div");
+    strip.className = "team-banner";
+    strip.innerHTML = `<p class="team-banner-label">Follow your team — tap to highlight your matches</p>`;
+    const grid = document.createElement("div");
+    grid.className = "team-grid";
+    for (const name of allTeams) {
+      const btn = document.createElement("button");
+      btn.className = "team-btn";
+      btn.textContent = name;
+      btn.addEventListener("click", () => { saveTeam(name); renderAll(); });
+      grid.appendChild(btn);
+    }
+    strip.appendChild(grid);
+
+    const dismiss = document.createElement("button");
+    dismiss.className = "team-banner-dismiss";
+    dismiss.textContent = "Skip";
+    dismiss.addEventListener("click", () => {
+      saveTeam("__none__");
+      renderAll();
+    });
+    strip.appendChild(dismiss);
+    el.appendChild(strip);
+  }
+}
+
+// ── MY NEXT MATCH ──────────────────────────────────────────────────────────────
+
+function renderMyNextMatch() {
+  const el = document.getElementById("myNextMatch");
+  el.innerHTML = "";
+  if (!selectedTeam || selectedTeam === "__none__") return;
+
+  const standings = getStandings();
+  const winners = {}, losers = {};
+  for (const g of knockoutTemplate) {
+    const tA = getSlotTeam(g.slotA, standings, winners, losers);
+    const tB = getSlotTeam(g.slotB, standings, winners, losers);
+    const r  = knockoutResult(g.id, tA, tB);
+    winners[g.id] = r.winner; losers[g.id] = r.loser;
+  }
+
+  // Find first unplayed match involving this team
+  const allM = [
+    ...groupMatches.map(m => {
+      const s = state.group[m.id];
+      return { time:m.time, court:m.court, label:`Group ${m.group}`,
+               tA:m.teamA, tB:m.teamB,
+               played: s.scoreA !== "" && s.scoreB !== "" };
+    }),
+    ...knockoutTemplate.map(g => {
+      const tA = getSlotTeam(g.slotA, standings, winners, losers);
+      const tB = getSlotTeam(g.slotB, standings, winners, losers);
+      const s  = state.knockout[g.id];
+      return { time:g.time, court:g.court, label:g.round,
+               tA, tB, played: s.scoreA !== "" && s.scoreB !== "" };
+    }),
+  ];
+
+  const next = allM
+    .filter(m => !m.played && (m.tA === selectedTeam || m.tB === selectedTeam))
+    .sort((a,b) => toMins(a.time) - toMins(b.time))[0];
+
+  if (!next) return;
+
+  const card = document.createElement("div");
+  card.className = "my-next-card";
+  card.innerHTML = `
+    <p class="my-next-eyebrow">Your next match</p>
+    <p class="my-next-matchup">${next.tA} vs ${next.tB}</p>
+    <div class="my-next-meta">
+      <span>${next.time}</span>
+      <span>·</span>
+      <span>${next.court}</span>
+      <span>·</span>
+      <span>${next.label}</span>
+    </div>`;
+  el.appendChild(card);
+}
+
+// ── SCHEDULE ───────────────────────────────────────────────────────────────────
 
 function renderSchedule() {
   const container = document.getElementById("scheduleView");
   container.innerHTML = "";
 
   const standings = getStandings();
-  const winners = {};
-  const losers = {};
+  const winners = {}, losers = {};
   for (const g of knockoutTemplate) {
     const tA = getSlotTeam(g.slotA, standings, winners, losers);
     const tB = getSlotTeam(g.slotB, standings, winners, losers);
-    const r = knockoutResult(g.id, tA, tB);
-    winners[g.id] = r.winner;
-    losers[g.id] = r.loser;
+    const r  = knockoutResult(g.id, tA, tB);
+    winners[g.id] = r.winner; losers[g.id] = r.loser;
   }
 
-  // Build flat list of all matches with metadata
   const allMatches = [
-    ...groupMatches.map((m) => {
+    ...groupMatches.map(m => {
       const s = state.group[m.id];
       const hasScore = s.scoreA !== "" && s.scoreB !== "";
-      return {
-        time: m.time, court: m.court, label: `Group ${m.group}`,
-        teams: `${m.teamA} vs ${m.teamB}`,
-        score: hasScore ? `${s.scoreA}–${s.scoreB}` : null,
-      };
+      return { time:m.time, court:m.court, tag:`Group ${m.group}`,
+               tA:m.teamA, tB:m.teamB, sA:s.scoreA, sB:s.scoreB, hasScore };
     }),
-    ...knockoutTemplate.map((g) => {
+    ...knockoutTemplate.map(g => {
       const tA = getSlotTeam(g.slotA, standings, winners, losers);
       const tB = getSlotTeam(g.slotB, standings, winners, losers);
-      const s = state.knockout[g.id];
+      const s  = state.knockout[g.id];
       const hasScore = s.scoreA !== "" && s.scoreB !== "";
-      return {
-        time: g.time, court: g.court, label: g.round,
-        teams: `${tA} vs ${tB}`,
-        score: hasScore ? `${s.scoreA}–${s.scoreB}` : null,
-      };
+      return { time:g.time, court:g.court, tag:g.round,
+               tA, tB, sA:s.scoreA, sB:s.scoreB, hasScore };
     }),
   ];
 
@@ -199,265 +294,318 @@ function renderSchedule() {
     slotMap.get(m.time).push(m);
   }
 
-  const sortedTimes = [...slotMap.keys()].sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
-  const now = nowMinutes();
+  const times = [...slotMap.keys()].sort((a,b) => toMins(a) - toMins(b));
+  const now   = nowMins();
 
-  // Determine current slot index
-  let nowSlotIdx = -1;
-  for (let i = 0; i < sortedTimes.length; i++) {
-    const slotMin = timeToMinutes(sortedTimes[i]);
-    const nextMin = i + 1 < sortedTimes.length ? timeToMinutes(sortedTimes[i + 1]) : slotMin + 45;
-    if (now >= slotMin && now < nextMin) { nowSlotIdx = i; break; }
+  let nowIdx = -1;
+  for (let i = 0; i < times.length; i++) {
+    const slotMin = toMins(times[i]);
+    const nextMin = i+1 < times.length ? toMins(times[i+1]) : slotMin + 45;
+    if (now >= slotMin && now < nextMin) { nowIdx = i; break; }
   }
 
-  for (let i = 0; i < sortedTimes.length; i++) {
-    const time = sortedTimes[i];
-    const matches = slotMap.get(time);
-    const isNow = i === nowSlotIdx;
-    const isPast = nowSlotIdx !== -1 ? i < nowSlotIdx : matches.every((m) => m.score !== null);
+  const earlier = [], upcoming = [];
+  let nextSlotRendered = false;
 
-    const slotEl = document.createElement("div");
-    slotEl.className = "time-slot";
+  for (let i = 0; i < times.length; i++) {
+    const t       = times[i];
+    const matches = slotMap.get(t);
+    const isNow   = i === nowIdx;
+    const isPast  = nowIdx >= 0 ? i < nowIdx : matches.every(m => m.hasScore);
 
-    const labelEl = document.createElement("div");
-    labelEl.className = `time-label${isNow ? " is-now" : ""}`;
-    labelEl.textContent = time;
     if (isNow) {
-      const badge = document.createElement("span");
-      badge.className = "now-badge";
-      badge.textContent = "NOW";
-      labelEl.appendChild(badge);
+      // ── IN PROGRESS ──
+      const section = document.createElement("div");
+      section.className = "inprogress-section";
+
+      const lbl = document.createElement("div");
+      lbl.className = "inprogress-label";
+      lbl.innerHTML = `<span class="inprogress-dot"></span> In Progress · ${t}`;
+      section.appendChild(lbl);
+
+      for (const m of matches) {
+        section.appendChild(makeInProgressCard(m));
+      }
+      container.appendChild(section);
+
+    } else if (isPast) {
+      earlier.push(...matches);
+
+    } else if (!nextSlotRendered) {
+      // ── NEXT UP ──
+      const lbl = document.createElement("div");
+      lbl.className = "slot-label";
+      lbl.textContent = `Next Up · ${t}`;
+      container.appendChild(lbl);
+
+      for (const m of matches) {
+        container.appendChild(makeMatchRow(m, true));
+      }
+      nextSlotRendered = true;
+
+    } else {
+      upcoming.push({ time: t, matches });
     }
-    slotEl.appendChild(labelEl);
+  }
 
-    for (const m of matches) {
-      const row = document.createElement("div");
-      row.className = ["match-row", isPast && !isNow ? "played" : "", isNow ? "is-now" : ""].filter(Boolean).join(" ");
+  // Upcoming slots
+  for (const slot of upcoming) {
+    const lbl = document.createElement("div");
+    lbl.className = "upcoming-label";
+    lbl.textContent = slot.time;
+    container.appendChild(lbl);
+    for (const m of slot.matches) container.appendChild(makeMatchRow(m, false));
+  }
 
-      const chip = document.createElement("span");
-      chip.className = "match-chip";
-      chip.textContent = m.label;
-
-      const teams = document.createElement("div");
-      teams.className = "match-teams";
-      teams.textContent = m.teams;
-
-      const score = document.createElement("div");
-      score.className = "match-score";
-      score.textContent = m.score ?? "–";
-
-      const court = document.createElement("div");
-      court.className = "match-court";
-      court.textContent = m.court;
-
-      row.append(chip, teams, score, court);
-      slotEl.appendChild(row);
-    }
-
-    container.appendChild(slotEl);
+  // Earlier (past, faded)
+  if (earlier.length) {
+    const lbl = document.createElement("div");
+    lbl.className = "earlier-label";
+    lbl.textContent = "Earlier";
+    container.appendChild(lbl);
+    for (const m of earlier) container.appendChild(makeMatchRow(m, false, true));
   }
 }
 
-// ─── RENDER: STANDINGS ────────────────────────────────────────────────────────
+function makeInProgressCard(m) {
+  const card = document.createElement("div");
+  card.className = "inprogress-card";
+
+  const bar = document.createElement("div");
+  bar.className = "inprogress-bar";
+
+  const inner = document.createElement("div");
+  inner.className = "inprogress-inner";
+
+  const matchup = document.createElement("div");
+  matchup.className = "inprogress-matchup";
+
+  const teamA = document.createElement("div");
+  teamA.className = "ip-team";
+  teamA.textContent = m.tA;
+
+  const scoreBlock = document.createElement("div");
+  scoreBlock.className = "ip-score-block";
+  if (m.hasScore) {
+    scoreBlock.innerHTML = `<div class="ip-score">${m.sA}<span style="font-size:0.55em;letter-spacing:0;margin:0 2px">–</span>${m.sB}</div>`;
+  } else {
+    scoreBlock.innerHTML = `<div class="ip-score" style="color:var(--muted);font-size:28px">–</div><span class="ip-vs">vs</span>`;
+  }
+
+  const teamB = document.createElement("div");
+  teamB.className = "ip-team right";
+  teamB.textContent = m.tB;
+
+  matchup.append(teamA, scoreBlock, teamB);
+  inner.appendChild(matchup);
+
+  const footer = document.createElement("div");
+  footer.className = "inprogress-footer";
+  footer.innerHTML = `<span class="court-tag">${m.court}</span><span>${m.tag}</span>`;
+  inner.appendChild(footer);
+
+  card.append(bar, inner);
+  return card;
+}
+
+function makeMatchRow(m, isNext, isPlayed = false) {
+  const isMyMatch = selectedTeam && selectedTeam !== "__none__" &&
+                    (m.tA === selectedTeam || m.tB === selectedTeam);
+  const row = document.createElement("div");
+  const cls = ["match-row"];
+  if (isPlayed) cls.push("played");
+  else if (isMyMatch && !isNext) cls.push("my-match");
+  else if (isNext) cls.push("is-next");
+  row.className = cls.join(" ");
+
+  const tag = document.createElement("span");
+  tag.className = "match-tag";
+  tag.textContent = m.tag;
+
+  const teams = document.createElement("div");
+  teams.className = "match-teams";
+  teams.textContent = `${m.tA} vs ${m.tB}`;
+
+  const score = document.createElement("div");
+  score.className = "match-score";
+  score.textContent = m.hasScore ? `${m.sA}–${m.sB}` : "–";
+
+  const court = document.createElement("span");
+  court.className = "court-tag";
+  court.textContent = m.court;
+
+  row.append(tag, teams, score, court);
+  return row;
+}
+
+// ── STANDINGS ──────────────────────────────────────────────────────────────────
 
 function renderStandings() {
   const standings = getStandings();
   const container = document.getElementById("standingsContainer");
   container.innerHTML = "";
 
-  for (const [groupName, table] of Object.entries(standings)) {
-    const block = document.createElement("div");
-    block.className = "group-block";
+  // Put my group first if selected
+  let groupOrder = Object.keys(standings);
+  const myGroup = selectedTeam && selectedTeam !== "__none__"
+    ? Object.entries(groups).find(([, teams]) => teams.includes(selectedTeam))?.[0]
+    : null;
+  if (myGroup) groupOrder = [myGroup, ...groupOrder.filter(g => g !== myGroup)];
 
-    const title = document.createElement("div");
-    title.className = "group-name";
-    title.textContent = `Group ${groupName}`;
-    block.appendChild(title);
+  for (const g of groupOrder) {
+    const table = standings[g];
+    const isMyGroup = g === myGroup;
+
+    const card = document.createElement("div");
+    card.className = `group-card${isMyGroup ? " my-group" : ""}`;
+
+    const hdr = document.createElement("div");
+    hdr.className = "group-header";
+    hdr.textContent = `Group ${g}`;
+    card.appendChild(hdr);
 
     const tbl = document.createElement("table");
     tbl.className = "s-table";
-    tbl.innerHTML = `
-      <thead>
-        <tr>
-          <th class="t-col">Team</th>
-          <th>W</th><th>D</th><th>L</th>
-          <th>GD</th><th>Pts</th>
-        </tr>
-      </thead>`;
+    tbl.innerHTML = `<thead><tr>
+      <th class="t">Team</th>
+      <th>W</th><th>L</th><th>Pts</th>
+    </tr></thead>`;
 
     const tbody = document.createElement("tbody");
     table.forEach((row, i) => {
       const tr = document.createElement("tr");
-      if (i < 2) tr.className = "advances";
+      const isMe = row.team === selectedTeam && selectedTeam !== "__none__";
+      if (i < 2) tr.className = "adv";
+      if (isMe)  tr.className = (tr.className ? tr.className + " " : "") + "me";
       tr.innerHTML = `
-        <td class="t-col">${row.team}</td>
+        <td class="t">${row.team}</td>
         <td>${row.w}</td>
-        <td>${row.d}</td>
         <td>${row.l}</td>
-        <td>${row.gd > 0 ? "+" : ""}${row.gd}</td>
-        <td class="p-col">${row.pts}</td>`;
+        <td class="p">${row.pts}</td>`;
       tbody.appendChild(tr);
     });
+
     tbl.appendChild(tbody);
-    block.appendChild(tbl);
+    card.appendChild(tbl);
 
     const note = document.createElement("div");
-    note.className = "advances-note";
+    note.className = "adv-note";
     note.textContent = "Top 2 advance";
-    block.appendChild(note);
+    card.appendChild(note);
 
-    container.appendChild(block);
+    container.appendChild(card);
   }
 }
 
-// ─── RENDER: BRACKET ──────────────────────────────────────────────────────────
+// ── BRACKET ────────────────────────────────────────────────────────────────────
 
-function renderBracketSnapshot() {
+function renderBracket() {
   const view = document.getElementById("bracketView");
   view.innerHTML = "";
 
-  const anyGroupScored = groupMatches.some((m) => state.group[m.id].scoreA !== "");
+  const anyScored = groupMatches.some(m => state.group[m.id].scoreA !== "");
 
-  if (!anyGroupScored) {
-    const empty = document.createElement("p");
-    empty.className = "bracket-empty";
-    empty.textContent = "Bracket fills in as group stage scores are entered.";
-    view.appendChild(empty);
+  if (!anyScored) {
+    view.innerHTML = `<p class="bracket-empty">Bracket fills in once group stage scores are entered.</p>`;
     return;
   }
 
   const standings = getStandings();
-  const winners = {};
-  const losers = {};
+  const winners = {}, losers = {};
 
   const rounds = [
-    { label: "Quarterfinals", ids: ["QF1", "QF2", "QF3", "QF4"] },
-    { label: "Semifinals",    ids: ["SF1", "SF2"] },
-    { label: "Finals",        ids: ["THIRD", "FINAL"] },
+    { label:"Quarterfinals", ids:["QF1","QF2","QF3","QF4"] },
+    { label:"Semifinals",    ids:["SF1","SF2"]             },
+    { label:"Finals",        ids:["THIRD","FINAL"]         },
   ];
 
-  for (const round of rounds) {
-    const roundEl = document.createElement("div");
-    roundEl.className = "b-round";
+  const scroll = document.createElement("div");
+  scroll.className = "bracket-scroll";
+  const tree = document.createElement("div");
+  tree.className = "bracket-tree";
 
-    const labelEl = document.createElement("div");
-    labelEl.className = "b-round-label";
-    labelEl.textContent = round.label;
-    roundEl.appendChild(labelEl);
+  for (const round of rounds) {
+    const col = document.createElement("div");
+    col.className = "b-col";
+
+    const lbl = document.createElement("div");
+    lbl.className = "b-col-label";
+    lbl.textContent = round.label;
+    col.appendChild(lbl);
 
     for (const id of round.ids) {
-      const game = knockoutTemplate.find((g) => g.id === id);
-      const tA = getSlotTeam(game.slotA, standings, winners, losers);
-      const tB = getSlotTeam(game.slotB, standings, winners, losers);
-      const result = knockoutResult(id, tA, tB);
-
-      // update winners/losers map for next round
-      winners[id] = result.winner;
-      losers[id] = result.loser;
+      const game = knockoutTemplate.find(g => g.id === id);
+      const tA   = getSlotTeam(game.slotA, standings, winners, losers);
+      const tB   = getSlotTeam(game.slotB, standings, winners, losers);
+      const res  = knockoutResult(id, tA, tB);
+      winners[id] = res.winner; losers[id] = res.loser;
 
       const s = state.knockout[id];
       const hasScore = s.scoreA !== "" && s.scoreB !== "";
-
-      const isTbdA = tA.startsWith("1st") || tA.startsWith("2nd") || tA.startsWith("Winner") || tA.startsWith("Loser");
-      const isTbdB = tB.startsWith("1st") || tB.startsWith("2nd") || tB.startsWith("Winner") || tB.startsWith("Loser");
+      const isTbd = t => t.startsWith("1st") || t.startsWith("2nd") ||
+                         t.startsWith("Winner") || t.startsWith("Loser");
 
       const matchEl = document.createElement("div");
       matchEl.className = "b-match";
 
-      const makeTeamRow = (name, score, isTbd, isWinner) => {
-        const row = document.createElement("div");
-        row.className = ["b-team", isWinner ? "winner" : "", isTbd ? "is-tbd" : ""].filter(Boolean).join(" ");
+      for (const [name, score, side] of [[tA, s.scoreA, "A"], [tB, s.scoreB, "B"]]) {
+        const rowEl = document.createElement("div");
+        rowEl.className = `b-team${res.winner === name ? " winner" : ""}`;
+
         const nameEl = document.createElement("span");
+        nameEl.className = `b-name${isTbd(name) ? " tbd" : ""}`;
         nameEl.textContent = name;
+
         const scoreEl = document.createElement("span");
         scoreEl.className = "b-score";
         scoreEl.textContent = hasScore ? score : "";
-        row.append(nameEl, scoreEl);
-        return row;
-      };
 
-      matchEl.appendChild(makeTeamRow(tA, s.scoreA, isTbdA, result.winner === tA));
-      matchEl.appendChild(makeTeamRow(tB, s.scoreB, isTbdB, result.winner === tB));
-      roundEl.appendChild(matchEl);
+        rowEl.append(nameEl, scoreEl);
+        matchEl.appendChild(rowEl);
+      }
+
+      col.appendChild(matchEl);
     }
 
-    view.appendChild(roundEl);
+    tree.appendChild(col);
   }
+
+  scroll.appendChild(tree);
+  view.appendChild(scroll);
 }
 
-// ─── RENDER: LEADERS ──────────────────────────────────────────────────────────
-
-function renderLeaders() {
-  const topScorersEl = document.getElementById("topScorers");
-  const topWinsEl = document.getElementById("topWins");
-  topScorersEl.innerHTML = "";
-  topWinsEl.innerHTML = "";
-
-  const scorerMap = new Map();
-  for (const game of groupMatches) {
-    const s = state.group[game.id];
-    for (const bundle of [s.scorersA, s.scorersB]) {
-      bundle.split(",").map((p) => p.trim()).filter(Boolean)
-        .forEach((p) => scorerMap.set(p, (scorerMap.get(p) || 0) + 1));
-    }
-  }
-
-  const sorted = [...scorerMap.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10);
-  if (!sorted.length) {
-    topScorersEl.innerHTML = "<li>No goals logged yet.</li>";
-  } else {
-    for (const [name, goals] of sorted) {
-      const li = document.createElement("li");
-      li.textContent = `${name} (${goals})`;
-      topScorersEl.appendChild(li);
-    }
-  }
-
-  const standings = getStandings();
-  const winRows = Object.values(standings).flat()
-    .sort((a, b) => b.w - a.w || b.pts - a.pts || a.team.localeCompare(b.team))
-    .slice(0, 10);
-  for (const team of winRows) {
-    const li = document.createElement("li");
-    li.textContent = `${team.team} (${team.w}W)`;
-    topWinsEl.appendChild(li);
-  }
-}
-
-// ─── RENDER: ADMIN MATCHES ────────────────────────────────────────────────────
+// ── ADMIN: GROUP MATCHES ────────────────────────────────────────────────────────
 
 function renderAdminMatches() {
   const container = document.getElementById("groupMatchesAdmin");
   container.innerHTML = "";
 
-  for (const match of groupMatches) {
-    const s = state.group[match.id];
+  for (const m of groupMatches) {
+    const s = state.group[m.id];
     const hasScore = s.scoreA !== "" && s.scoreB !== "";
 
     const card = document.createElement("div");
-    card.className = `admin-card${hasScore ? " is-scored" : ""}`;
+    card.className = `admin-card${hasScore ? " scored" : ""}`;
 
-    const header = document.createElement("div");
-    header.className = "admin-card-header";
-    header.innerHTML = `
-      <span class="admin-chip">Group ${match.group}</span>
-      <span class="admin-card-title">${match.teamA} vs ${match.teamB}</span>
-      <span class="admin-card-meta">${match.time} · ${match.court}</span>`;
-    card.appendChild(header);
+    card.innerHTML = `<div class="admin-card-head">
+      <span class="admin-round-tag">Group ${m.group}</span>
+      <span class="admin-card-title">${m.teamA} vs ${m.teamB}</span>
+      <span class="admin-card-time">${m.time} · ${m.court}</span>
+    </div>`;
 
-    card.appendChild(makeScoreRow(match.id, "A", match.teamA, "group"));
-    card.appendChild(makeScoreRow(match.id, "B", match.teamB, "group"));
+    card.appendChild(makeAdminScoreRow(m.id, "A", m.teamA, "group"));
+    card.appendChild(makeAdminScoreRow(m.id, "B", m.teamB, "group"));
 
     const hint = document.createElement("p");
     hint.className = "scorers-hint";
     hint.textContent = "Scorers (comma separated)";
     card.appendChild(hint);
 
-    for (const [side, team] of [["A", match.teamA], ["B", match.teamB]]) {
+    for (const [side, team] of [["A", m.teamA], ["B", m.teamB]]) {
       const ta = document.createElement("textarea");
       ta.placeholder = `${team} scorers`;
       ta.value = s[`scorers${side}`];
-      ta.addEventListener("change", (e) => updateGroup(match.id, `scorers${side}`, e.target.value));
+      ta.addEventListener("change", e => updateGroup(m.id, `scorers${side}`, e.target.value));
       card.appendChild(ta);
     }
 
@@ -469,196 +617,176 @@ function renderKnockoutAdmin() {
   const container = document.getElementById("knockoutAdmin");
   container.innerHTML = "";
   const standings = getStandings();
-  const winners = {};
-  const losers = {};
+  const winners = {}, losers = {};
 
-  for (const game of knockoutTemplate) {
-    const tA = getSlotTeam(game.slotA, standings, winners, losers);
-    const tB = getSlotTeam(game.slotB, standings, winners, losers);
-    const s = state.knockout[game.id];
+  for (const g of knockoutTemplate) {
+    const tA = getSlotTeam(g.slotA, standings, winners, losers);
+    const tB = getSlotTeam(g.slotB, standings, winners, losers);
+    const s  = state.knockout[g.id];
     const hasScore = s.scoreA !== "" && s.scoreB !== "";
 
     const card = document.createElement("div");
-    card.className = `admin-card${hasScore ? " is-scored" : ""}`;
+    card.className = `admin-card${hasScore ? " scored" : ""}`;
 
-    const header = document.createElement("div");
-    header.className = "admin-card-header";
-    header.innerHTML = `
-      <span class="admin-chip">${game.round}</span>
+    card.innerHTML = `<div class="admin-card-head">
+      <span class="admin-round-tag">${g.round}</span>
       <span class="admin-card-title">${tA} vs ${tB}</span>
-      <span class="admin-card-meta">${game.time} · ${game.court}</span>`;
-    card.appendChild(header);
+      <span class="admin-card-time">${g.time} · ${g.court}</span>
+    </div>`;
 
-    card.appendChild(makeScoreRow(game.id, "A", tA, "knockout"));
-    card.appendChild(makeScoreRow(game.id, "B", tB, "knockout"));
+    card.appendChild(makeAdminScoreRow(g.id, "A", tA, "knockout"));
+    card.appendChild(makeAdminScoreRow(g.id, "B", tB, "knockout"));
 
-    const select = document.createElement("select");
-    select.innerHTML = `<option value="">If tied — pick penalty winner</option>
+    const sel = document.createElement("select");
+    sel.innerHTML = `<option value="">If tied — choose penalty winner</option>
       <option value="A">${tA}</option>
       <option value="B">${tB}</option>`;
-    select.value = s.tiebreakWinner || "";
-    select.addEventListener("change", (e) => updateKnockout(game.id, "tiebreakWinner", e.target.value));
-    card.appendChild(select);
+    sel.value = s.tiebreakWinner || "";
+    sel.addEventListener("change", e => updateKnockout(g.id, "tiebreakWinner", e.target.value));
+    card.appendChild(sel);
 
     container.appendChild(card);
 
-    const result = knockoutResult(game.id, tA, tB);
-    winners[game.id] = result.winner;
-    losers[game.id] = result.loser;
+    const res = knockoutResult(g.id, tA, tB);
+    winners[g.id] = res.winner; losers[g.id] = res.loser;
   }
 }
 
-function makeScoreRow(matchId, side, teamName, type) {
+function makeAdminScoreRow(matchId, side, teamName, type) {
   const row = document.createElement("div");
   row.className = "score-row";
-  const label = document.createElement("label");
-  label.textContent = teamName;
-  const input = document.createElement("input");
-  input.type = "number";
-  input.min = "0";
-  input.max = "99";
-  input.value = type === "group" ? state.group[matchId][`score${side}`] : state.knockout[matchId][`score${side}`];
-  input.addEventListener("change", (e) => {
+  const lbl = document.createElement("label");
+  lbl.className = "score-label";
+  lbl.textContent = teamName;
+  const inp = document.createElement("input");
+  inp.type = "number"; inp.min = "0"; inp.max = "99";
+  inp.value = type === "group"
+    ? state.group[matchId][`score${side}`]
+    : state.knockout[matchId][`score${side}`];
+  inp.addEventListener("change", e => {
     if (type === "group") updateGroup(matchId, `score${side}`, e.target.value);
     else updateKnockout(matchId, `score${side}`, e.target.value);
   });
-  row.append(label, input);
+  row.append(lbl, inp);
   return row;
 }
 
-// ─── UPDATE HANDLERS ──────────────────────────────────────────────────────────
+// ── UPDATE HANDLERS ────────────────────────────────────────────────────────────
 
 function updateGroup(matchId, field, value) {
   state.group[matchId][field] = value;
-  touchUpdateTime();
-  saveState();
-  renderAllLive();
-  scheduleSyncPush();
+  touch(); saveState(); renderAll(); scheduleSyncPush();
 }
 
 function updateKnockout(matchId, field, value) {
   state.knockout[matchId][field] = value;
-  touchUpdateTime();
-  saveState();
-  renderAllLive();
-  renderKnockoutAdmin();
-  scheduleSyncPush();
+  touch(); saveState(); renderAll(); renderKnockoutAdmin(); scheduleSyncPush();
 }
 
-function renderAllLive() {
+function renderAll() {
+  renderTeamBanner();
+  renderMyNextMatch();
   renderSchedule();
   renderStandings();
-  renderBracketSnapshot();
-  renderLeaders();
+  renderBracket();
 }
 
-// ─── TABS ─────────────────────────────────────────────────────────────────────
+// ── TABS ───────────────────────────────────────────────────────────────────────
 
 function initTabs() {
-  document.querySelectorAll(".tab").forEach((btn) => {
+  document.querySelectorAll(".tab").forEach(btn => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
-      document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById(btn.dataset.tab).classList.add("active");
     });
   });
 }
 
-// ─── RESET ────────────────────────────────────────────────────────────────────
+// ── ADMIN GUARD ────────────────────────────────────────────────────────────────
+
+function initAdmin() {
+  const isAdmin = new URLSearchParams(window.location.search).has("admin");
+  if (!isAdmin) return;
+  document.getElementById("adminTab").classList.remove("hidden");
+  document.getElementById("resetBtn").classList.remove("hidden");
+  renderAdminMatches();
+  renderKnockoutAdmin();
+}
+
+// ── RESET ──────────────────────────────────────────────────────────────────────
 
 function initReset() {
   document.getElementById("resetBtn").addEventListener("click", () => {
-    if (!window.confirm("Reset all scores and stats? This cannot be undone.")) return;
+    if (!confirm("Reset all scores? This cannot be undone.")) return;
     Object.assign(state, structuredClone(defaultState));
-    touchUpdateTime();
-    saveState();
-    renderAdminMatches();
-    renderKnockoutAdmin();
-    renderAllLive();
+    touch(); saveState();
+    renderAdminMatches(); renderKnockoutAdmin(); renderAll();
     scheduleSyncPush();
   });
 }
 
-// ─── SYNC ─────────────────────────────────────────────────────────────────────
+// ── SYNC ───────────────────────────────────────────────────────────────────────
 
-function escapeRoom(room) { return encodeURIComponent(room.trim()); }
+function escRoom(r) { return encodeURIComponent(r.trim()); }
 
-function getSyncHeaders() {
-  return {
-    apikey: syncConfig.key,
-    Authorization: `Bearer ${syncConfig.key}`,
-    "Content-Type": "application/json",
-  };
+function syncHeaders() {
+  return { apikey: syncConfig.key, Authorization: `Bearer ${syncConfig.key}`, "Content-Type": "application/json" };
 }
 
-async function fetchRemoteState() {
-  const endpoint = `${syncConfig.url}/rest/v1/tournament_state?room_id=eq.${escapeRoom(syncConfig.room)}&select=payload,updated_at&limit=1`;
-  const res = await fetch(endpoint, { headers: getSyncHeaders() });
-  if (!res.ok) throw new Error(`Fetch failed (${res.status})`);
-  const data = await res.json();
-  return data[0] || null;
+async function fetchRemote() {
+  const res = await fetch(`${syncConfig.url}/rest/v1/tournament_state?room_id=eq.${escRoom(syncConfig.room)}&select=payload,updated_at&limit=1`, { headers: syncHeaders() });
+  if (!res.ok) throw new Error(`${res.status}`);
+  const d = await res.json();
+  return d[0] || null;
 }
 
-async function pushRemoteState() {
+async function pushRemote() {
   if (!syncConfig.connected || syncInFlight) return;
   syncInFlight = true;
   try {
     const res = await fetch(`${syncConfig.url}/rest/v1/tournament_state`, {
       method: "POST",
-      headers: { ...getSyncHeaders(), Prefer: "resolution=merge-duplicates" },
+      headers: { ...syncHeaders(), Prefer: "resolution=merge-duplicates" },
       body: JSON.stringify([{ room_id: syncConfig.room.trim(), payload: state }]),
     });
-    if (!res.ok) throw new Error(`Push failed (${res.status})`);
+    if (!res.ok) throw new Error(`${res.status}`);
     setSyncStatus(`Synced · ${new Date().toLocaleTimeString()}`);
-  } catch (err) {
-    setSyncStatus(`Sync error: ${err.message}`);
-  } finally {
-    syncInFlight = false;
-  }
+  } catch (e) {
+    setSyncStatus(`Sync error: ${e.message}`);
+  } finally { syncInFlight = false; }
 }
 
-async function pullRemoteState() {
+async function pullRemote() {
   if (!syncConfig.connected || syncInFlight) return;
   syncInFlight = true;
   try {
-    const remote = await fetchRemoteState();
-    if (!remote?.payload) { setSyncStatus("Connected · no remote data yet"); return; }
-    const localTs = Number(state?.meta?.updatedAt || 0);
+    const remote = await fetchRemote();
+    if (!remote?.payload) { setSyncStatus("Connected · no data yet"); return; }
+    const localTs  = Number(state?.meta?.updatedAt || 0);
     const remoteTs = Number(remote.payload?.meta?.updatedAt || 0);
     if (remoteTs > localTs) {
-      Object.assign(state, mergeStateDefaults(remote.payload));
+      Object.assign(state, mergeDefaults(remote.payload));
       saveState();
-      renderAdminMatches();
-      renderKnockoutAdmin();
-      renderAllLive();
+      renderAdminMatches(); renderKnockoutAdmin(); renderAll();
       setSyncStatus(`Pulled · ${new Date().toLocaleTimeString()}`);
     } else {
       setSyncStatus(`Up to date · ${new Date().toLocaleTimeString()}`);
     }
-  } catch (err) {
-    setSyncStatus(`Sync error: ${err.message}`);
-  } finally {
-    syncInFlight = false;
-  }
+  } catch (e) {
+    setSyncStatus(`Sync error: ${e.message}`);
+  } finally { syncInFlight = false; }
 }
 
 function scheduleSyncPush() {
   if (!syncConfig.connected) return;
   clearTimeout(syncDebounceTimer);
-  syncDebounceTimer = setTimeout(pushRemoteState, 500);
+  syncDebounceTimer = setTimeout(pushRemote, 500);
 }
 
-function startPolling() {
-  stopPolling();
-  syncPollTimer = setInterval(pullRemoteState, SYNC_POLL_MS);
-}
-
-function stopPolling() {
-  if (!syncPollTimer) return;
-  clearInterval(syncPollTimer);
-  syncPollTimer = null;
-}
+function startPolling() { stopPolling(); syncPollTimer = setInterval(pullRemote, SYNC_POLL_MS); }
+function stopPolling()  { clearInterval(syncPollTimer); syncPollTimer = null; }
 
 function readSyncForm() {
   syncConfig.url  = document.getElementById("sbUrl").value.trim().replace(/\/$/, "");
@@ -675,51 +803,41 @@ function hydrateSyncForm() {
 async function connectSync() {
   readSyncForm();
   if (!syncConfig.url || !syncConfig.key || !syncConfig.room) {
-    setSyncStatus("Enter URL, anon key, and room ID first.");
-    return;
+    setSyncStatus("Enter URL, anon key, and room ID first."); return;
   }
-  syncConfig.connected = true;
-  saveSyncConfig();
+  syncConfig.connected = true; saveSyncConfig();
   try {
-    const remote = await fetchRemoteState();
-    if (!remote) { touchUpdateTime(); await pushRemoteState(); setSyncStatus("Connected · initialized room"); }
-    else { await pullRemoteState(); }
+    const remote = await fetchRemote();
+    if (!remote) { touch(); await pushRemote(); setSyncStatus("Connected · room initialized"); }
+    else { await pullRemote(); }
     startPolling();
-  } catch (err) {
-    syncConfig.connected = false;
-    saveSyncConfig();
-    setSyncStatus(`Connection failed: ${err.message}`);
+  } catch (e) {
+    syncConfig.connected = false; saveSyncConfig();
+    setSyncStatus(`Failed: ${e.message}`);
   }
-}
-
-function disconnectSync() {
-  syncConfig.connected = false;
-  saveSyncConfig();
-  stopPolling();
-  setSyncStatus("Disconnected.");
 }
 
 function initSyncControls() {
   hydrateSyncForm();
   document.getElementById("connectSyncBtn").addEventListener("click", connectSync);
-  document.getElementById("disconnectSyncBtn").addEventListener("click", disconnectSync);
-  document.getElementById("pullSyncBtn").addEventListener("click", pullRemoteState);
-  document.getElementById("pushSyncBtn").addEventListener("click", pushRemoteState);
+  document.getElementById("disconnectSyncBtn").addEventListener("click", () => {
+    syncConfig.connected = false; saveSyncConfig(); stopPolling(); setSyncStatus("Disconnected.");
+  });
+  document.getElementById("pullSyncBtn").addEventListener("click", pullRemote);
+  document.getElementById("pushSyncBtn").addEventListener("click", pushRemote);
   if (syncConfig.connected && syncConfig.url && syncConfig.key && syncConfig.room) {
-    setSyncStatus("Reconnecting...");
-    connectSync();
+    setSyncStatus("Reconnecting…"); connectSync();
   }
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────────────────────────────────
 
 function init() {
   initTabs();
+  initAdmin();
   initReset();
   initSyncControls();
-  renderAdminMatches();
-  renderKnockoutAdmin();
-  renderAllLive();
+  renderAll();
 }
 
 init();

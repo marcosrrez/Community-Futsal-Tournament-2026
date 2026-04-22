@@ -2,97 +2,87 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Live scores, standings, and bracket for Community Futsal Tournament 2026." />
-    <title>Futsal 2026 – Game Day</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="description" content="Live scores, standings, and bracket — Community Futsal Tournament 2026." />
+    <title>Futsal 2026</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="topbar">
-      <div class="topbar-left">
-        <p class="eyebrow">Futsal Tournament 2026</p>
-        <h1>Game Day</h1>
+
+    <header class="header">
+      <div>
+        <p class="event-tag">Futsal Tournament 2026</p>
+        <h1 class="event-title">Game Day</h1>
       </div>
-      <div class="topbar-right">
-        <div class="tab-bar" role="tablist">
-          <button class="tab active" data-tab="live" role="tab">Live</button>
-          <button class="tab" data-tab="ops" role="tab">Admin</button>
-        </div>
-        <button id="resetBtn" class="btn danger sm">Reset</button>
+      <div class="header-right">
+        <button id="resetBtn" class="btn-reset hidden">Reset</button>
       </div>
     </header>
 
+    <nav class="tabs" role="tablist" aria-label="App sections">
+      <button class="tab active" data-tab="schedule" role="tab">Schedule</button>
+      <button class="tab"        data-tab="standings" role="tab">Standings</button>
+      <button class="tab"        data-tab="bracket"   role="tab">Bracket</button>
+      <button class="tab hidden" data-tab="ops"       role="tab" id="adminTab">Admin</button>
+    </nav>
+
     <main>
-      <!-- ── LIVE / PLAYER VIEW ───────────────────── -->
-      <section id="live" class="tab-panel active" role="tabpanel">
 
-        <div class="card">
-          <p class="card-title">Schedule</p>
-          <div id="scheduleView"></div>
-        </div>
-
-        <div class="card">
-          <p class="card-title">Group Standings</p>
-          <div id="standingsContainer" class="standings-grid"></div>
-        </div>
-
-        <div class="card" id="bracketCard">
-          <p class="card-title">Knockout Bracket</p>
-          <div class="bracket-scroll">
-            <div id="bracketView" class="bracket-tree"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <p class="card-title">Stat Leaders</p>
-          <div class="leaders-row">
-            <div>
-              <h3>Top Scorers</h3>
-              <ol id="topScorers"></ol>
-            </div>
-            <div>
-              <h3>Most Wins</h3>
-              <ol id="topWins"></ol>
-            </div>
-          </div>
-        </div>
-
+      <!-- ── SCHEDULE ─────────────────────────── -->
+      <section id="schedule" class="tab-panel active" role="tabpanel">
+        <div id="teamBanner"></div>
+        <div id="myNextMatch"></div>
+        <div id="scheduleView"></div>
       </section>
 
-      <!-- ── ADMIN / OPS VIEW ─────────────────────── -->
+      <!-- ── STANDINGS ────────────────────────── -->
+      <section id="standings" class="tab-panel" role="tabpanel">
+        <p class="standings-intro">Top 2 from each group advance to the quarterfinals.</p>
+        <div id="standingsContainer" class="groups-grid"></div>
+      </section>
+
+      <!-- ── BRACKET ──────────────────────────── -->
+      <section id="bracket" class="tab-panel" role="tabpanel">
+        <p class="bracket-intro">Fills in as the group stage is completed.</p>
+        <div id="bracketView"></div>
+      </section>
+
+      <!-- ── ADMIN (hidden unless ?admin) ─────── -->
       <section id="ops" class="tab-panel" role="tabpanel">
 
-        <details class="card sync-details">
+        <details class="admin-sync">
           <summary>Cloud Sync (Supabase)</summary>
           <div class="sync-body">
             <div class="sync-fields">
               <label class="field-label">Supabase URL
-                <input id="sbUrl" type="text" placeholder="https://YOUR-PROJECT.supabase.co" autocomplete="off" />
+                <input id="sbUrl" type="text" placeholder="https://….supabase.co" autocomplete="off" />
               </label>
               <label class="field-label">Anon Key
-                <input id="sbKey" type="password" placeholder="eyJ..." autocomplete="off" />
+                <input id="sbKey" type="password" placeholder="eyJ…" autocomplete="off" />
               </label>
               <label class="field-label">Room ID
-                <input id="sbRoom" type="text" placeholder="community-futsal-2026" autocomplete="off" />
+                <input id="sbRoom" type="text" placeholder="futsal-2026" autocomplete="off" />
               </label>
             </div>
-            <div class="sync-actions">
-              <button id="connectSyncBtn" class="btn primary sm">Connect</button>
+            <div class="sync-row">
+              <button id="connectSyncBtn"    class="btn primary sm">Connect</button>
               <button id="disconnectSyncBtn" class="btn sm">Disconnect</button>
-              <button id="pullSyncBtn" class="btn sm">Pull</button>
-              <button id="pushSyncBtn" class="btn sm">Push</button>
+              <button id="pullSyncBtn"       class="btn sm">Pull</button>
+              <button id="pushSyncBtn"       class="btn sm">Push</button>
               <span id="syncStatus">Not connected</span>
             </div>
           </div>
         </details>
 
-        <div class="card">
-          <p class="card-title">Group Stage</p>
+        <div class="admin-section">
+          <h2 class="admin-section-title">Group Stage</h2>
           <div id="groupMatchesAdmin" class="admin-list"></div>
         </div>
 
-        <div class="card">
-          <p class="card-title">Knockout Stage</p>
+        <div class="admin-section">
+          <h2 class="admin-section-title">Knockout Stage</h2>
           <div id="knockoutAdmin" class="admin-list"></div>
         </div>
 
