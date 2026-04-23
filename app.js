@@ -156,49 +156,53 @@ function renderTeamBanner() {
 
   const allTeams = Object.values(groups).flat();
 
-  if (selectedTeam) {
-    // Show compact "following" strip with change option
+  if (selectedTeam && selectedTeam !== "__none__") {
+    // Compact single-line strip: "Following  Los Tigres  [Change]"
     const strip = document.createElement("div");
-    strip.className = "team-banner";
+    strip.className = "team-banner-compact";
     strip.innerHTML = `
-      <p class="team-banner-label">Following</p>
-      <div class="team-grid" id="teamGridInline"></div>
+      <span class="tbc-label">Following</span>
+      <span class="tbc-name">${selectedTeam}</span>
+      <button class="tbc-change" aria-label="Change team">Change</button>
     `;
-    el.appendChild(strip);
-    const grid = strip.querySelector("#teamGridInline");
-    for (const name of allTeams) {
-      const btn = document.createElement("button");
-      btn.className = `team-btn${name === selectedTeam ? " selected" : ""}`;
-      btn.textContent = name;
-      btn.addEventListener("click", () => { saveTeam(name); renderAll(); });
-      grid.appendChild(btn);
-    }
-  } else {
-    // First-time prompt
-    const strip = document.createElement("div");
-    strip.className = "team-banner";
-    strip.innerHTML = `<p class="team-banner-label">Follow your team — tap to highlight your matches</p>`;
-    const grid = document.createElement("div");
-    grid.className = "team-grid";
-    for (const name of allTeams) {
-      const btn = document.createElement("button");
-      btn.className = "team-btn";
-      btn.textContent = name;
-      btn.addEventListener("click", () => { saveTeam(name); renderAll(); });
-      grid.appendChild(btn);
-    }
-    strip.appendChild(grid);
-
-    const dismiss = document.createElement("button");
-    dismiss.className = "team-banner-dismiss";
-    dismiss.textContent = "Skip";
-    dismiss.addEventListener("click", () => {
-      saveTeam("__none__");
-      renderAll();
+    strip.querySelector(".tbc-change").addEventListener("click", () => {
+      el.innerHTML = "";
+      el.appendChild(buildTeamPicker(allTeams));
     });
-    strip.appendChild(dismiss);
     el.appendChild(strip);
+
+  } else if (!selectedTeam) {
+    // First-time: show picker
+    el.appendChild(buildTeamPicker(allTeams));
   }
+  // selectedTeam === "__none__" → show nothing (user explicitly skipped)
+}
+
+function buildTeamPicker(allTeams) {
+  const strip = document.createElement("div");
+  strip.className = "team-banner";
+  const lbl = document.createElement("p");
+  lbl.className = "team-banner-label";
+  lbl.textContent = "Which team are you on?";
+  strip.appendChild(lbl);
+
+  const grid = document.createElement("div");
+  grid.className = "team-grid";
+  for (const name of allTeams) {
+    const btn = document.createElement("button");
+    btn.className = `team-btn${name === selectedTeam ? " selected" : ""}`;
+    btn.textContent = name;
+    btn.addEventListener("click", () => { saveTeam(name); renderAll(); });
+    grid.appendChild(btn);
+  }
+  strip.appendChild(grid);
+
+  const dismiss = document.createElement("button");
+  dismiss.className = "team-banner-dismiss";
+  dismiss.textContent = "I'm just watching";
+  dismiss.addEventListener("click", () => { saveTeam("__none__"); renderAll(); });
+  strip.appendChild(dismiss);
+  return strip;
 }
 
 // ── MY NEXT MATCH ──────────────────────────────────────────────────────────────
@@ -418,23 +422,25 @@ function makeMatchRow(m, isNext, isPlayed = false) {
   else if (isNext) cls.push("is-next");
   row.className = cls.join(" ");
 
-  const tag = document.createElement("span");
-  tag.className = "match-tag";
-  tag.textContent = m.tag;
+  // Top line: meta (tag + court)
+  const meta = document.createElement("div");
+  meta.className = "match-meta-row";
+  meta.innerHTML = `<span class="match-tag">${m.tag}</span><span class="court-tag">${m.court}</span>`;
+
+  // Bottom line: teams + score
+  const body = document.createElement("div");
+  body.className = "match-body-row";
 
   const teams = document.createElement("div");
   teams.className = "match-teams";
-  teams.textContent = `${m.tA} vs ${m.tB}`;
+  teams.innerHTML = `<span class="match-team-a">${m.tA}</span><span class="match-sep">vs</span><span class="match-team-b">${m.tB}</span>`;
 
   const score = document.createElement("div");
   score.className = "match-score";
   score.textContent = m.hasScore ? `${m.sA}–${m.sB}` : "–";
 
-  const court = document.createElement("span");
-  court.className = "court-tag";
-  court.textContent = m.court;
-
-  row.append(tag, teams, score, court);
+  body.append(teams, score);
+  row.append(meta, body);
   return row;
 }
 
